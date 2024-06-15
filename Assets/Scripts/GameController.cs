@@ -126,7 +126,7 @@ public class GameController : MonoBehaviour
         }
 
         RaycastHit hit;
-
+#if UNITY_EDITOR
         if (Physics.Raycast(m_mainCam.ScreenPointToRay(Input.mousePosition), out hit, float.MaxValue, microsystemLayers))
         {
             Microsystem ms = hit.collider.transform.parent.GetComponent<Microsystem>();
@@ -141,7 +141,7 @@ public class GameController : MonoBehaviour
 
                 CurrentHoveredMicrosystem = ms;
                 CurrentHoveredMicrosystem.SetHovered(true);
-#if UNITY_EDITOR
+
                 if (Input.GetMouseButtonDown(0))
                 {
                     CurrentHoveredMicrosystem.SetHovered(false);
