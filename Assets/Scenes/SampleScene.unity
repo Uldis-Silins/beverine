@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 705507994}
-  m_IndirectSpecularColor: {r: 0.44657844, g: 0.49641222, b: 0.57481676, a: 1}
+  m_IndirectSpecularColor: {r: 0.18018535, g: 0.22559482, b: 0.30677685, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -398,8 +398,8 @@ MonoBehaviour:
   microsystemLayers:
     serializedVersion: 2
     m_Bits: 128
-  puzzlePosition: {fileID: 0}
-  puzzlePrefab: {fileID: 0}
+  puzzlePosition: {fileID: 86990909}
+  puzzlePrefab: {fileID: 1918859522831429273, guid: d10d7a5c538064dcc99f1d91c8d372f2, type: 3}
   onGameStart:
     m_PersistentCalls:
       m_Calls: []

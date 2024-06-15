@@ -23,6 +23,8 @@ public class GameController : MonoBehaviour
 
     private StateHandler m_stateHandler;
 
+    private Vector3 m_puzzleDonePosition;
+
     private Dictionary<GameStateType, StateHandler> m_states;
 
     public GameStateType CurrentGameState { get; private set; }
@@ -144,6 +146,8 @@ public class GameController : MonoBehaviour
 
                 if (Input.GetMouseButtonDown(0))
                 {
+                    m_puzzleDonePosition = CurrentHoveredMicrosystem.selectable.transform.position;
+                    CurrentPuzzle = Instantiate(puzzlePrefab, m_puzzleDonePosition, Quaternion.identity);
                     CurrentHoveredMicrosystem.SetHovered(false);
                     CurrentHoveredMicrosystem = null;
                     CurrentGameState = GameStateType.Puzzle;
@@ -168,11 +172,20 @@ public class GameController : MonoBehaviour
 
     private void EnterState_Puzzle()
     {
+        CurrentPuzzle.StartMoveAnimation(puzzlePosition.position, 1f);
+        CurrentPuzzle.onSolved.AddListener(OnPuzzleSolved);
         m_stateHandler = State_Puzzle;
     }
 
     private void State_Puzzle()
     {
+        if(CurrentPuzzle == null) Debug.LogError("Current puzzle is null");
+
+        if(!CurrentPuzzle.InAnimation)
+        {
+            // Handle puzzle input
+        }
+
         if (CurrentGameState != GameStateType.Puzzle)
         {
             ExitState_Puzzle(m_states[CurrentGameState]);
@@ -182,6 +195,7 @@ public class GameController : MonoBehaviour
 
     private void ExitState_Puzzle(StateHandler targetState)
     {
+        CurrentPuzzle.onSolved.RemoveListener(OnPuzzleSolved);
         m_stateHandler = targetState;
     }
 
@@ -195,5 +209,11 @@ public class GameController : MonoBehaviour
 #endif
         onGameStart.Invoke();
         Debug.Log("Game Started");
+    }
+
+    public void OnPuzzleSolved()
+    {
+        CurrentPuzzle.StartMoveAnimation(m_puzzleDonePosition, 1f);
+        CurrentGameState = GameStateType.Select;
     }
 }
