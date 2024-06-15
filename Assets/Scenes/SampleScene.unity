@@ -339,6 +339,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   startButton: {fileID: 1567600144}
+  sunPrefab: {fileID: 3642097189632508846, guid: 6dea63667da724048942694662e29f18, type: 3}
+  microsystemLayers:
+    serializedVersion: 2
+    m_Bits: 128
   onGameStart:
     m_PersistentCalls:
       m_Calls: []
