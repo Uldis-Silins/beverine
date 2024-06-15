@@ -7,7 +7,7 @@ using UnityEngine.Events;
 
 public class GameController : MonoBehaviour
 {
-    public enum GameStateType { None, Start, Select, Puzzle }
+    public enum GameStateType { None, Start, Select, Puzzle, GameOver }
 
     private delegate void StateHandler();
 
@@ -23,9 +23,10 @@ public class GameController : MonoBehaviour
 
     private StateHandler m_stateHandler;
 
-    private Vector3 m_puzzleDonePosition;
+    private Microsystem m_currentPuzzleMicrosystem;
 
     private Dictionary<GameStateType, StateHandler> m_states;
+    private List<Microsystem> m_solvedMicrosystems;
 
     public GameStateType CurrentGameState { get; private set; }
     public Sun CurrentSun { get; private set; }
@@ -43,8 +44,11 @@ public class GameController : MonoBehaviour
             { GameStateType.None, EnterState_None },
             { GameStateType.Start, EnterState_Start },
             { GameStateType.Select, EnterState_Select },
-            { GameStateType.Puzzle, EnterState_Puzzle }
+            { GameStateType.Puzzle, EnterState_Puzzle },
+            { GameStateType.GameOver, EnterState_GameOver }
         };
+
+        m_solvedMicrosystems = new List<Microsystem>();
     }
 
     private void Start()
@@ -146,8 +150,8 @@ public class GameController : MonoBehaviour
 
                 if (Input.GetMouseButtonDown(0))
                 {
-                    m_puzzleDonePosition = CurrentHoveredMicrosystem.selectable.transform.position;
-                    CurrentPuzzle = Instantiate(puzzlePrefab, m_puzzleDonePosition, Quaternion.identity);
+                    m_currentPuzzleMicrosystem = CurrentHoveredMicrosystem;
+                    CurrentPuzzle = Instantiate(puzzlePrefab, m_currentPuzzleMicrosystem.selectable.transform.position, Quaternion.identity);
                     CurrentHoveredMicrosystem.SetHovered(false);
                     CurrentHoveredMicrosystem = null;
                     CurrentGameState = GameStateType.Puzzle;
@@ -199,6 +203,24 @@ public class GameController : MonoBehaviour
         m_stateHandler = targetState;
     }
 
+    private void EnterState_GameOver()
+    {
+        m_stateHandler = State_GameOver;
+    }
+
+    private void State_GameOver()
+    {
+        if(CurrentGameState != GameStateType.GameOver)
+        {
+            ExitState_GameOver(m_states[CurrentGameState]);
+        }
+    }
+
+    private void ExitState_GameOver(StateHandler targetState)
+    {
+        m_stateHandler = targetState;
+    }
+
     /// Start game session on button push
     public void OnStartGame()
     {
@@ -213,7 +235,14 @@ public class GameController : MonoBehaviour
 
     public void OnPuzzleSolved()
     {
-        CurrentPuzzle.StartMoveAnimation(m_puzzleDonePosition, 1f);
+        CurrentPuzzle.StartMoveAnimation(m_currentPuzzleMicrosystem.selectable.transform.position, 1f);
         CurrentGameState = GameStateType.Select;
+        m_solvedMicrosystems.Add(m_currentPuzzleMicrosystem);
+        m_currentPuzzleMicrosystem = null;
+
+        if(m_solvedMicrosystems.Count >= 8)
+        {
+            CurrentGameState = GameStateType.GameOver;
+        }
     }
 }
