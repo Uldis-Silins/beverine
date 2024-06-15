@@ -148,7 +148,6 @@ public class GameController : MonoBehaviour
                     CurrentHoveredMicrosystem = null;
                     CurrentGameState = GameStateType.Puzzle;
                 }
-#endif  // UNITY_EDITOR
             }
         }
         else
@@ -159,6 +158,7 @@ public class GameController : MonoBehaviour
                 CurrentHoveredMicrosystem = null;
             }
         }
+#endif  // UNITY_EDITOR
     }
 
     private void ExitState_Select(StateHandler targetState)
@@ -190,7 +190,9 @@ public class GameController : MonoBehaviour
     {
         startButton.gameObject.SetActive(false);
         CurrentSun = Instantiate(sunPrefab, startButton.transform.position, startButton.transform.rotation);
+#if UNITY_EDITOR
         CurrentSun.StartSpawnAnimation(m_mainCam.transform.forward);
+#endif
         onGameStart.Invoke();
         Debug.Log("Game Started");
     }
