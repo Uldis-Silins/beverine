@@ -17,7 +17,7 @@ MonoBehaviour:
   handTrackingSupport: 1
   handTrackingFrequency: 0
   handTrackingVersion: 2
-  anchorSupport: 0
+  anchorSupport: 1
   sharedAnchorSupport: 0
   renderModelSupport: 0
   trackedKeyboardSupport: 0
@@ -35,10 +35,10 @@ MonoBehaviour:
   requiresSystemKeyboard: 0
   experimentalFeaturesEnabled: 0
   insightPassthroughEnabled: 0
-  _insightPassthroughSupport: 0
+  _insightPassthroughSupport: 1
   _processorFavor: 0
   systemSplashScreen: {fileID: 0}
   systemSplashScreenType: 0
   _systemLoadingScreenBackground: 0
-  ovrPluginMd5Win64: 9622adb0c825689c7a69d4de80ae2f0e98e046173d2855c95322e0c3f01fb2b8
-  ovrPluginMd5Android: 01d89b6385c0568f3a175449d4370ee04b7867981629478e0d3d8f532f28dff7
+  ovrPluginMd5Win64: 9622adb0c825689c7a69d4de80ae2f0e4eff67065c77ed6968aabba6ead580b3
+  ovrPluginMd5Android: 01d89b6385c0568f3a175449d4370ee0f8b39696d0e1d21a6d9b385999809dd9
