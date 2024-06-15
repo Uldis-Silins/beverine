@@ -6,7 +6,7 @@ public class Sun : MonoBehaviour
 {
     public Microsystem microsystemPrefab;
     public float spawnMoveDistance = 10f;
-    public float spawnMoveSpeed = 10f;
+    public float spawnMoveSpeed = 15f;
     public float microsystemSpawnDistance = 10f;
 
     private Vector3 m_startAnimationPosition;
@@ -32,7 +32,7 @@ public class Sun : MonoBehaviour
                
             var spawnDir = new Vector3(x, y, 0);
             var instance = Instantiate(microsystemPrefab, transform.position, Quaternion.identity);
-            instance.Spawn(transform.position, transform.position + spawnDir * microsystemSpawnDistance, 1f);
+            instance.Spawn(transform.position, transform.position + spawnDir * microsystemSpawnDistance, 2f);
             m_spawnedMicrosystems.Add(instance);
         }
         

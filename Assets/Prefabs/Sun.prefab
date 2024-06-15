@@ -47,7 +47,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   microsystemPrefab: {fileID: 4495829847749106026, guid: 1e88658e508ab460d8180f6a964ce59e, type: 3}
   spawnMoveDistance: 10
-  spawnMoveSpeed: 10
+  spawnMoveSpeed: 15
   microsystemSpawnDistance: 10
 --- !u!1 &960521928476225182
 GameObject:
@@ -111,7 +111,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 10303, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 2100000, guid: 844ff6e4c2cac41329f7c9e54a3f4485, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0

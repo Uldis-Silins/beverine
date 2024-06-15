@@ -69,7 +69,7 @@ public class Microsystem : MonoBehaviour
     {
         if(IsHovered == isHovered) return;
 
-        m_selectableRenderer.material.SetColor("_Color", isHovered ? Color.green : Color.white);
+        m_selectableRenderer.material.SetColor("_BaseColor", isHovered ? Color.green : Color.white);
         IsHovered = isHovered;
         m_hoverScaleTimer = m_hoverScaleTime;
     }

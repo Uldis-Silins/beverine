@@ -15,6 +15,10 @@ public class GameController : MonoBehaviour
     public Sun sunPrefab;
     public LayerMask microsystemLayers;
 
+    public Transform puzzlePosition;
+
+    public Puzzle puzzlePrefab;
+
     [HideInInspector] public UnityEvent onGameStart;
 
     private StateHandler m_stateHandler;
@@ -24,6 +28,7 @@ public class GameController : MonoBehaviour
     public GameStateType CurrentGameState { get; private set; }
     public Sun CurrentSun { get; private set; }
     public Microsystem CurrentHoveredMicrosystem { get; private set; }
+    public Puzzle CurrentPuzzle { get; private set; }
 
 #if UNITY_EDITOR
     [SerializeField] private Camera m_mainCam;
