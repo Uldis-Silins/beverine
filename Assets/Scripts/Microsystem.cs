@@ -1,35 +1,38 @@
 using System.Collections;
 using System.Collections.Generic;
-using Unity.VisualScripting;
+using JetBrains.Annotations;
 using UnityEngine;
+using UnityEngine.Events;
 
 public class Microsystem : MonoBehaviour
 {
-    public GameObject selectable;
+    public UnityEvent onSelcted;
+    public UnityEvent onDeselected;
+    public UnityEvent onStartPuzzle;
+
     public ParticleSystem moveParticles;
     public AnimationCurve spawnAnimCurve;
-    public AnimationCurve hoverScaleAnimationCurve;
-    [SerializeField] private Renderer m_selectableRenderer;
+
+    public Transform puzzleTransform;
+    public SphereCollider selectionCollider;
 
     private Vector3 m_startPosition;
     private Vector3 m_targetPosition;
     private float m_spawnAnimTime;
     private float m_spawnAnimTimer;
-    private float m_hoverScaleTimer;
-    private Vector3 m_startScale;
-    private readonly float m_hoverScaleTime = 0.25f;
+    private float m_selectAnimationTimer;
+    private float m_selectAnimationTime = 3f;
+    private Vector3 m_selectTargetPosition;
 
-    public bool InAnimation { get; private set; }
+    public bool InSpawnAnimation { get; private set; }
+    public bool InSelectAnimation { get; private set; }
+    public bool InDeselectAnimation { get; private set; }
     public bool IsHovered { get; private set; }
-
-    private void Start()
-    {
-        m_startScale = selectable.transform.localScale;
-    }
+    public bool InPuzzlePosition { get; private set; }
 
     private void Update()
     {
-        if(m_spawnAnimTimer > 0f)
+        if (m_spawnAnimTimer > 0f)
         {
             float t = spawnAnimCurve.Evaluate(m_spawnAnimTimer / m_spawnAnimTime);
             t = 1f - t;
@@ -37,22 +40,52 @@ public class Microsystem : MonoBehaviour
 
             m_spawnAnimTimer -= Time.deltaTime;
 
-            if(m_spawnAnimTimer <= 0f)
+            if (m_spawnAnimTimer <= 0f)
             {
                 transform.position = m_targetPosition;
                 moveParticles.Stop();
-                InAnimation = false;
+                InSpawnAnimation = false;
             }
         }
 
-        if(m_hoverScaleTimer > 0f)
+        if (InSelectAnimation)
         {
-            float t = m_hoverScaleTimer / m_hoverScaleTime;
-            if(IsHovered) t = 1f - t;
-            Vector3 hoveredScale = m_startScale + Vector3.one * 0.25f;
-            selectable.transform.localScale = Vector3.Lerp(m_startScale, hoveredScale, hoverScaleAnimationCurve.Evaluate(t));
-            m_hoverScaleTimer -= Time.deltaTime;
+            transform.position = Vector3.Lerp(transform.position, m_selectTargetPosition, 5f * Time.deltaTime);
+
+            if (Vector3.Distance(transform.position, m_selectTargetPosition) < 0.25f)
+            {
+                InPuzzlePosition = true;
+            }
         }
+
+        if (InDeselectAnimation)
+        {
+            transform.position = Vector3.Lerp(transform.position, m_targetPosition, 10f * Time.deltaTime);
+
+            if (Vector3.Distance(transform.position, m_targetPosition) < 0.25f)
+            {
+                InDeselectAnimation = false;
+                onDeselected.Invoke();
+            }
+        }
+    }
+
+    public void Select(Vector3 moveTarget)
+    {
+        transform.position = Vector3.Lerp(transform.position, moveTarget, Time.deltaTime);
+
+        if (Vector3.Distance(transform.position, moveTarget) < 3f)
+        {
+            selectionCollider.enabled = false;
+            m_selectTargetPosition = moveTarget;
+            InSelectAnimation = true;
+            onSelcted.Invoke();
+        }
+    }
+
+    public void Deselect()
+    {
+        InDeselectAnimation = true;
     }
 
     public void Spawn(Vector3 startPos, Vector3 targetPos, float t)
@@ -62,15 +95,6 @@ public class Microsystem : MonoBehaviour
         m_spawnAnimTime = t;
         m_spawnAnimTimer = t;
         moveParticles.Play();
-        InAnimation = true;
-    }
-
-    public void SetHovered(bool isHovered)
-    {
-        if(IsHovered == isHovered) return;
-
-        m_selectableRenderer.material.SetColor("_BaseColor", isHovered ? Color.green : Color.white);
-        IsHovered = isHovered;
-        m_hoverScaleTimer = m_hoverScaleTime;
+        InSpawnAnimation = true;
     }
 }

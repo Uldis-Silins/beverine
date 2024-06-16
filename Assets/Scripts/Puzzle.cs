@@ -30,6 +30,11 @@ public class Puzzle : MonoBehaviour
     public PuzzleStateType CurrentState { get; private set; }
     public bool InAnimation { get; private set; }
 
+    private void Start()
+    {
+        CurrentState = PuzzleStateType.Solve;
+    }
+
     private void Update()
     {
         if (InAnimation)
@@ -52,7 +57,7 @@ public class Puzzle : MonoBehaviour
             {
                 if (m_inDoneRotation)
                 {
-                    if(outerRing.eulerAngles.z - solvedRotation > 0.5f)
+                    if (outerRing.eulerAngles.z - solvedRotation > 0.5f)
                     {
                         float rotation = Mathf.Lerp(m_fromDoneRotation, solvedRotation, Time.deltaTime);
                         outerRing.Rotate(Vector3.forward * rotation);
@@ -61,7 +66,7 @@ public class Puzzle : MonoBehaviour
 
                     m_doneTimer -= Time.deltaTime;
 
-                    if(m_doneTimer < 0f)
+                    if (m_doneTimer < 0f)
                     {
                         m_inDoneRotation = false;
                         CurrentState = PuzzleStateType.Done;
@@ -104,6 +109,21 @@ public class Puzzle : MonoBehaviour
                 }
             }
 #endif
+        }
+    }
+
+    public void Rotate(float drag)
+    {
+        if (CurrentState == PuzzleStateType.Solve)
+        {
+            outerRing.Rotate(Vector3.up * drag * Time.deltaTime);
+            innerRing.Rotate(Vector3.up * -drag * Time.deltaTime);
+        }
+
+        if (Mathf.Abs(outerRing.eulerAngles.y) < 2f)
+        {
+            CurrentState = PuzzleStateType.Done;
+            onSolved.Invoke();
         }
     }
 

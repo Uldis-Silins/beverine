@@ -5,21 +5,9 @@ EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Scenes:
-  - enabled: 0
-    path: Assets/Scenes/DanScene.unity
-    guid: 20da270be96461c4396b87f8a720d432
-  - enabled: 0
-    path: Assets/keesc.unity
-    guid: f361cd7999c47964b87ade7a1185f167
-  - enabled: 0
-    path: Assets/Scenes/RingPositionScene.unity
-    guid: 03cbdc70f842bfa4aa77ebad95800857
-  - enabled: 0
+  - enabled: 1
     path: Assets/Scenes/Ending.unity
     guid: 6330ee5835a3bd14fbb8acacde9ec342
-  - enabled: 1
-    path: Assets/Scenes/RingMixed.unity
-    guid: 64e6ad140c05b0d46a2fcfa1333ab95e
   m_configObjects:
     Unity.XR.Oculus.Settings: {fileID: 11400000, guid: 90dc04a673f774790b3e9f20d29127b0, type: 2}
     com.unity.xr.management.loader_settings: {fileID: 11400000, guid: 502b9ce10642c478fa9eecbee41aefa9, type: 2}

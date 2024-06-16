@@ -354,6 +354,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8270407451764355676}
+  - component: {fileID: 7776274873429826325}
+  - component: {fileID: 328041099303253238}
   m_Layer: 0
   m_Name: RING_8
   m_TagString: Untagged
@@ -379,3 +381,101 @@ Transform:
   - {fileID: 4495884984247799582}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &7776274873429826325
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9044643627093136652}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 87a025286e09248eaa2a4b1a5b64819b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  onSelcted:
+    m_PersistentCalls:
+      m_Calls: []
+  onDeselected:
+    m_PersistentCalls:
+      m_Calls: []
+  onStartPuzzle:
+    m_PersistentCalls:
+      m_Calls: []
+  moveParticles: {fileID: 0}
+  spawnAnimCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 0.65
+      value: 0.05
+      inSlope: 0.23694102
+      outSlope: 0.23694102
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.2628205
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 5.0234795
+      outSlope: 5.0234795
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.0714285
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  puzzleTransform: {fileID: 0}
+--- !u!114 &328041099303253238
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9044643627093136652}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f14800c5e3e474fce92fa001daad9015, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  onSolved:
+    m_PersistentCalls:
+      m_Calls: []
+  innerRing: {fileID: 1898820894821112846}
+  outerRing: {fileID: 8784322697824098593}
+  moveAnimationCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 1
+      outSlope: 1
+      tangentMode: 34
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 1
+      outSlope: 1
+      tangentMode: 34
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  solvedRotation: 0

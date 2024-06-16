@@ -11,8 +11,11 @@ public class GameController : MonoBehaviour
 
     private delegate void StateHandler();
 
+    public Pinchtract input;
     public GameStartButton startButton;
-    public Sun sunPrefab;
+    public Sun sun;
+    public GameObject panoramaObject;
+    public Renderer panoramaRenderer;
     public LayerMask microsystemLayers;
 
     public Transform puzzlePosition;
@@ -30,7 +33,6 @@ public class GameController : MonoBehaviour
     private List<Microsystem> m_solvedMicrosystems;
 
     public GameStateType CurrentGameState { get; private set; }
-    public Sun CurrentSun { get; private set; }
     public Microsystem CurrentHoveredMicrosystem { get; private set; }
     public Puzzle CurrentPuzzle { get; private set; }
 
@@ -86,6 +88,8 @@ public class GameController : MonoBehaviour
 
     private void EnterState_Start()
     {
+        input.onStartHit.AddListener(OnStartGameClick);
+        input.SetState(Pinchtract.GameStateType.Start);
         m_stateHandler = State_Start;
     }
 
@@ -105,9 +109,7 @@ public class GameController : MonoBehaviour
             {
                 if (hit.collider.gameObject == startButton.gameObject)
                 {
-                    hit.collider.GetComponent<GameStartButton>().OnStartGameClick();
-                    OnStartGame();
-                    CurrentGameState = GameStateType.Select;
+                    OnStartGameClick(hit.collider.gameObject);
                 }
             }
         }
@@ -116,11 +118,15 @@ public class GameController : MonoBehaviour
 
     private void ExitState_Start(StateHandler targetState)
     {
+        input.onStartHit.RemoveListener(OnStartGameClick);
         m_stateHandler = targetState;
     }
 
     private void EnterState_Select()
     {
+        input.SetState(Pinchtract.GameStateType.Select);
+        input.onMicrosystemSelect.AddListener(OnMicrosystemSelect);
+        input.onMicrosystemDeselect.AddListener(OnMicrosystemDeselect);
         m_stateHandler = State_Select;
     }
 
@@ -132,63 +138,49 @@ public class GameController : MonoBehaviour
             return;
         }
 
-        RaycastHit hit;
-#if UNITY_EDITOR
-        if (Physics.Raycast(m_mainCam.ScreenPointToRay(Input.mousePosition), out hit, float.MaxValue, microsystemLayers))
+        if(input.CurrentHitMicrosystem != null && !m_solvedMicrosystems.Contains(input.CurrentHitMicrosystem))
         {
-            Microsystem ms = hit.collider.transform.parent.GetComponent<Microsystem>();
-
-            if (ms != null && !ms.InAnimation)
-            {
-                if (CurrentHoveredMicrosystem != null && CurrentHoveredMicrosystem != ms)
-                {
-                    CurrentHoveredMicrosystem.SetHovered(false);
-                    CurrentHoveredMicrosystem = null;
-                }
-
-                CurrentHoveredMicrosystem = ms;
-                CurrentHoveredMicrosystem.SetHovered(true);
-
-                if (Input.GetMouseButtonDown(0))
-                {
-                    m_currentPuzzleMicrosystem = CurrentHoveredMicrosystem;
-                    CurrentPuzzle = Instantiate(puzzlePrefab, m_currentPuzzleMicrosystem.selectable.transform.position, Quaternion.identity);
-                    CurrentHoveredMicrosystem.SetHovered(false);
-                    CurrentHoveredMicrosystem = null;
-                    CurrentGameState = GameStateType.Puzzle;
-                }
-            }
+            CurrentHoveredMicrosystem = input.CurrentHitMicrosystem;
+            CurrentHoveredMicrosystem.Select(puzzlePosition.position);
+            CurrentHoveredMicrosystem.onSelcted.AddListener(OnMoveToPuzzle);
         }
         else
         {
-            if (CurrentHoveredMicrosystem != null)
+            if(CurrentHoveredMicrosystem != null)
             {
-                CurrentHoveredMicrosystem.SetHovered(false);
+                CurrentHoveredMicrosystem.Deselect();
+                CurrentHoveredMicrosystem.onSelcted.RemoveListener(OnMoveToPuzzle);
+                CurrentPuzzle = CurrentHoveredMicrosystem.GetComponent<Puzzle>();
+                m_currentPuzzleMicrosystem = CurrentHoveredMicrosystem;
                 CurrentHoveredMicrosystem = null;
             }
         }
-#endif  // UNITY_EDITOR
     }
 
     private void ExitState_Select(StateHandler targetState)
     {
+        input.onMicrosystemSelect.RemoveListener(OnMicrosystemSelect);
+        input.onMicrosystemDeselect.RemoveListener(OnMicrosystemDeselect);
         m_stateHandler = targetState;
     }
 
     private void EnterState_Puzzle()
     {
-        CurrentPuzzle.StartMoveAnimation(puzzlePosition.position, 1f);
-        CurrentPuzzle.onSolved.AddListener(OnPuzzleSolved);
+        input.SetState(Pinchtract.GameStateType.Puzzle);
+        if(CurrentPuzzle != null)
+        {
+            CurrentPuzzle.onSolved.AddListener(OnPuzzleSolved);
+        }
+
         m_stateHandler = State_Puzzle;
     }
 
     private void State_Puzzle()
     {
-        if(CurrentPuzzle == null) Debug.LogError("Current puzzle is null");
-
-        if(!CurrentPuzzle.InAnimation)
+        if(input.CurrentHitPuzzle != null)
         {
-            // Handle puzzle input
+            CurrentPuzzle = input.CurrentHitPuzzle;
+            CurrentPuzzle.Rotate(input.DragDelta);
         }
 
         if (CurrentGameState != GameStateType.Puzzle)
@@ -206,6 +198,7 @@ public class GameController : MonoBehaviour
 
     private void EnterState_GameOver()
     {
+        panoramaObject.SetActive(true);
         m_stateHandler = State_GameOver;
     }
 
@@ -215,6 +208,8 @@ public class GameController : MonoBehaviour
         {
             ExitState_GameOver(m_states[CurrentGameState]);
         }
+
+        panoramaRenderer.material.SetColor("_BaseColor", Color.Lerp(Color.white, Color.clear, Time.deltaTime * 0.25f));
     }
 
     private void ExitState_GameOver(StateHandler targetState)
@@ -226,17 +221,14 @@ public class GameController : MonoBehaviour
     public void OnStartGame()
     {
         startButton.gameObject.SetActive(false);
-        CurrentSun = Instantiate(sunPrefab, startButton.transform.position, startButton.transform.rotation);
-#if UNITY_EDITOR
-        CurrentSun.StartSpawnAnimation(m_mainCam.transform.forward);
-#endif
+        sun.StartSpawnAnimation();
         onGameStart.Invoke();
         Debug.Log("Game Started");
     }
 
     public void OnPuzzleSolved()
     {
-        CurrentPuzzle.StartMoveAnimation(m_currentPuzzleMicrosystem.selectable.transform.position, 1f);
+        CurrentPuzzle.GetComponent<Microsystem>().Deselect();
         CurrentGameState = GameStateType.Select;
         m_solvedMicrosystems.Add(m_currentPuzzleMicrosystem);
 
@@ -246,8 +238,41 @@ public class GameController : MonoBehaviour
         }
 
         SunLink link = Instantiate(linkPrefab, m_currentPuzzleMicrosystem.transform.position, Quaternion.identity);
-        link.StartMoveAnimation(m_currentPuzzleMicrosystem.transform.position, CurrentSun.transform.position);
+        link.StartMoveAnimation(m_currentPuzzleMicrosystem.transform.position, sun.transform.position);
 
         m_currentPuzzleMicrosystem = null;
+    }
+
+    private void OnStartGameClick(GameObject hitObject)
+    {
+        startButton.transform.parent = null;
+        puzzlePosition.transform.parent = null;
+        sun.gameObject.SetActive(true);
+        sun.transform.position = startButton.transform.position;
+        sun.transform.rotation = startButton.transform.rotation;
+        sun.transform.localScale = startButton.transform.localScale;
+        hitObject.GetComponent<GameStartButton>().OnStartGameClick();
+        OnStartGame();
+        CurrentGameState = GameStateType.Select;
+    }
+
+    private void OnMicrosystemSelect(Microsystem hit)
+    {
+        if(CurrentHoveredMicrosystem != null && CurrentHoveredMicrosystem != hit)
+        {
+            CurrentHoveredMicrosystem.Deselect();
+        }
+
+        CurrentHoveredMicrosystem = hit;
+        CurrentHoveredMicrosystem.Select(puzzlePosition.position);
+    }
+
+    private void OnMicrosystemDeselect()
+    {
+    }
+
+    private void OnMoveToPuzzle()
+    {
+        CurrentGameState = GameStateType.Puzzle;
     }
 }

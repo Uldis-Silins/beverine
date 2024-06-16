@@ -1,63 +1,93 @@
 using UnityEngine;
-using UnityEngine.UIElements;
+using UnityEngine.Events;
 
-public class PinchObjectAttractor : MonoBehaviour
+public class Pinchtract : MonoBehaviour
 {
-    public OVRHand hand; // Assign the OVRHand component for your hand in the inspector
-    public Transform objectToAttract; // Assign the transform of the object to attract
+    public enum GameStateType { None, Start, Select, Puzzle, GameOver }
+
+    public UnityEvent<GameObject> onStartHit;
+    public UnityEvent<Microsystem> onMicrosystemSelect;
+    public UnityEvent onMicrosystemDeselect;
     public Transform pointer;
     public float attractionSpeed = 2.0f; // Speed of attraction
+    public LayerMask startHitLayers;
+    public LayerMask selectHitLayers;
+    public LayerMask puzzleHitLayers;
+
     private bool isAttracting = false;
     public LineRenderer pointerLine;
-    private Vector3 prevPos;
-    private Transform objectMan;
+    private Vector3 m_prevDragPosition;
+    public Microsystem CurrentHitMicrosystem { get; private set; }
+    public Puzzle CurrentHitPuzzle { get; private set; }
+    public float DragDelta { get; private set; }
 
+    public GameStateType CurrentState { get; private set; }
 
     void Update()
     {
-        // Check if the index finger is pinching
-        RaycastHit hits;
-        
-        pointerLine.SetPosition(0, pointer.position);
-        pointerLine.SetPosition(1, pointer.position - pointer.right * 0.15F);
-        if (Physics.Raycast(pointer.position, -pointer.right, out hits, 0.15F)) {
-            if (objectMan == null){
-                prevPos = pointer.position;
-                objectMan = hits.collider.transform;
-            }
-            Vector3 delta = pointer.position - prevPos;
-            delta *= 100F;
-            hits.collider.transform.Rotate(Vector3.up * (delta.x + delta.y) );
-            prevPos = pointer.position;
-        }
-        else {
-            objectMan = null;
-        }
+        switch (CurrentState)
+        {
+            case GameStateType.Start:
+                Collider[] hits = Physics.OverlapSphere(pointer.position, 0.15f, startHitLayers);
 
-        bool isPinching = hand.GetFingerIsPinching(OVRHand.HandFinger.Index);
-        if (isPinching)
-        {
-            StartAttraction();
-        }
-        else
-        {
-            StopAttraction();
-        }
+                if(hits.Length > 0)
+                {
+                    onStartHit.Invoke(hits[0].gameObject);
+                }
+                break;
+            case GameStateType.Select:
+                RaycastHit selectHit;
 
-        // If the object is being attracted, move it towards the hand
-        if (isAttracting)
-        {
-            objectToAttract.position = Vector3.MoveTowards(objectToAttract.position, hand.transform.position, attractionSpeed * Time.deltaTime);
+                //pointerLine.enabled = true;
+
+                pointerLine.SetPosition(0, pointer.position);
+                pointerLine.SetPosition(1, pointer.position - pointer.right * 30f);
+                if (Physics.Raycast(pointer.position, -pointer.right, out selectHit, 30f, selectHitLayers))
+                {
+                    pointerLine.SetPosition(1, selectHit.point);
+                    CurrentHitMicrosystem = selectHit.collider.transform.parent.GetComponent<Microsystem>();
+                    pointerLine.material.SetColor("_BaseColor", Color.red);
+                }
+                else
+                {
+                    onMicrosystemDeselect.Invoke();
+                    CurrentHitMicrosystem = null;
+                    pointerLine.material.SetColor("_BaseColor", Color.white);
+                }
+                break;
+            case GameStateType.Puzzle:
+                Collider[] puzzleHits = Physics.OverlapSphere(pointer.position, 0.05f, puzzleHitLayers);
+
+                if (puzzleHits.Length > 0)
+                {
+                    if(CurrentHitPuzzle == null) 
+                    {
+                        m_prevDragPosition = pointer.position;
+
+                        CurrentHitPuzzle = puzzleHits[0].transform.parent.GetComponent<Puzzle>();
+                    }
+
+                    if(CurrentHitPuzzle != null)
+                    {
+                        Vector3 drag = pointer.position - m_prevDragPosition;
+                        DragDelta = drag.x + drag.z;
+                        DragDelta *= 2500f;
+                        m_prevDragPosition = pointer.position;
+                        pointerLine.material.SetColor("_BaseColor", Color.blue);
+                    }
+                }
+                else
+                {
+                    DragDelta = 0f;
+                    CurrentHitPuzzle = null;
+                    pointerLine.material.SetColor("_BaseColor", Color.white);
+                }
+                break;
         }
     }
 
-    private void StartAttraction()
+    public void SetState(GameStateType type)
     {
-        isAttracting = true;
-    }
-
-    private void StopAttraction()
-    {
-        isAttracting = false;
+        CurrentState = type;
     }
 }
