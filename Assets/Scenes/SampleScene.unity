@@ -154,37 +154,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &418047434
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 418047435}
-  m_Layer: 0
-  m_Name: EMPTY_DELETEME
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &418047435
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 418047434}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 10.040394}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &705507993
 GameObject:
   m_ObjectHideFlags: 0
@@ -431,6 +400,7 @@ MonoBehaviour:
     m_Bits: 128
   puzzlePosition: {fileID: 86990909}
   puzzlePrefab: {fileID: 1918859522831429273, guid: d10d7a5c538064dcc99f1d91c8d372f2, type: 3}
+  linkPrefab: {fileID: 2349846150943954095, guid: 71d0afd2deecf428eaef13d9d62bd7fd, type: 3}
   onGameStart:
     m_PersistentCalls:
       m_Calls: []
@@ -577,4 +547,3 @@ SceneRoots:
   - {fileID: 1414975674}
   - {fileID: 1567600148}
   - {fileID: 86990909}
-  - {fileID: 418047435}

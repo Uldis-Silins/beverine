@@ -18,6 +18,7 @@ public class GameController : MonoBehaviour
     public Transform puzzlePosition;
 
     public Puzzle puzzlePrefab;
+    public SunLink linkPrefab;
 
     [HideInInspector] public UnityEvent onGameStart;
 
@@ -238,11 +239,15 @@ public class GameController : MonoBehaviour
         CurrentPuzzle.StartMoveAnimation(m_currentPuzzleMicrosystem.selectable.transform.position, 1f);
         CurrentGameState = GameStateType.Select;
         m_solvedMicrosystems.Add(m_currentPuzzleMicrosystem);
-        m_currentPuzzleMicrosystem = null;
 
         if(m_solvedMicrosystems.Count >= 8)
         {
             CurrentGameState = GameStateType.GameOver;
         }
+
+        SunLink link = Instantiate(linkPrefab, m_currentPuzzleMicrosystem.transform.position, Quaternion.identity);
+        link.StartMoveAnimation(m_currentPuzzleMicrosystem.transform.position, CurrentSun.transform.position);
+
+        m_currentPuzzleMicrosystem = null;
     }
 }
